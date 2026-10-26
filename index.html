@@ -132,6 +132,7 @@
   const lin = c => c <= 0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4);
   const toLinear = hex => [1,3,5].map(i => lin(parseInt(hex.slice(i,i+2),16)/255)).concat(1);
 
+  const CASE_OPACITY = 0.7, CASE_DOUBLE_SIDED = true;
   const mv = document.getElementById("mv");
   const wrap = document.getElementById("swatches");
   let current = 0;
@@ -154,6 +155,16 @@
     };
     set("Case_MintSatin", p.body); set("Crown_Yellow", p.a);
     set("Button_Yellow", p.a);     set("Button_Blue", p.b);
+    // case + back lid: slightly translucent, like clear-tinted PETG
+    const c = mv.model.getMaterialByName("Case_MintSatin");
+    if (c) {
+      const f = toLinear(p.body); f[3] = CASE_OPACITY;
+      c.pbrMetallicRoughness.setBaseColorFactor(f);
+      c.pbrMetallicRoughness.setMetallicFactor(0);
+      c.pbrMetallicRoughness.setRoughnessFactor(0.35);
+      c.setAlphaMode("BLEND");
+      c.setDoubleSided(CASE_DOUBLE_SIDED);
+    }
   }
   mv.addEventListener("load", applyColor);
 
